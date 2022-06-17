@@ -1,7 +1,53 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import fs from 'fs';
+import {resolve} from 'path';
+import path from 'path';
+
+import react from '@vitejs/plugin-react';
+import lessToJS from 'less-vars-to-js';
+import {defineConfig, loadEnv} from 'vite';
+import eslintPlugin from 'vite-plugin-eslint';
+import vitePluginImp from 'vite-plugin-imp';
+
+const themeVariables = lessToJS(
+  fs.readFileSync(path.resolve(__dirname, './src/style/theme.less'), 'utf8')
+);
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-});
+export default ({mode}) => {
+  process.env = {...process.env, ...loadEnv(mode, process.cwd())};
+  return defineConfig({
+    base: process.env.PUBLIC_URL || '/',
+    build: {
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'index.html'),
+          admin: resolve(__dirname, 'admin/index.html'),
+        },
+      },
+      outDir: 'build',
+    },
+    resolve: {
+      alias: {'@': path.resolve(__dirname, 'src')},
+    },
+    plugins: [
+      react(),
+      vitePluginImp({
+        libList: [
+          {
+            libName: 'antd',
+            style: (name) => `antd/es/${name}/style`,
+          },
+        ],
+      }),
+      eslintPlugin(),
+    ],
+    css: {
+      preprocessorOptions: {
+        less: {
+          modifyVars: themeVariables,
+          javascriptEnabled: true,
+        },
+      },
+    },
+  });
+};
