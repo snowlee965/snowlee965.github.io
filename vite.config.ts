@@ -12,9 +12,13 @@ const themeVariables = lessToJS(
   fs.readFileSync(path.resolve(__dirname, './src/style/theme.less'), 'utf8')
 );
 
+console.log('process:::env', process.argv[process.argv.length - 1]);
+
 // https://vitejs.dev/config/
 export default ({mode}) => {
   process.env = {...process.env, ...loadEnv(mode, process.cwd())};
+  // import.meta.env.VITE_NAME available here with: process.env.VITE_NAME
+  // import.meta.env.VITE_PORT available here with: process.env.VITE_PORT
   return defineConfig({
     base: process.env.PUBLIC_URL || '/',
     build: {
@@ -23,11 +27,12 @@ export default ({mode}) => {
           main: resolve(__dirname, 'index.html'),
           admin: resolve(__dirname, 'admin/index.html'),
         },
+        output: {
+          manualChunks: {echarts: ['echarts'], lodash: ['lodash']},
+        },
       },
       outDir: 'build',
-    },
-    resolve: {
-      alias: {'@': path.resolve(__dirname, 'src')},
+      chunkSizeWarningLimit: 1024,
     },
     plugins: [
       react(),
@@ -48,6 +53,9 @@ export default ({mode}) => {
           javascriptEnabled: true,
         },
       },
+    },
+    resolve: {
+      alias: {'@': path.resolve(__dirname, 'src')},
     },
   });
 };
