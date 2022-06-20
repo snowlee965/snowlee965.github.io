@@ -43,7 +43,7 @@ export const WebLayout: React.FC = () => {
           <Outlet />
         </SiteLayoutContent>
       </Content>
-      <Footer style={{textAlign: 'center'}}>Copyright © 2015-2022 华中师范大学</Footer>
+      <Footer style={{textAlign: 'center'}}>Copyright</Footer>
     </Layout>
   );
 };

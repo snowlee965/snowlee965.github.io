@@ -27,9 +27,6 @@ export default ({mode}) => {
           main: resolve(__dirname, 'index.html'),
           admin: resolve(__dirname, 'admin/index.html'),
         },
-        output: {
-          manualChunks: {echarts: ['echarts'], lodash: ['lodash']},
-        },
       },
       outDir: 'build',
       chunkSizeWarningLimit: 1024,
@@ -56,6 +53,9 @@ export default ({mode}) => {
     },
     resolve: {
       alias: {'@': path.resolve(__dirname, 'src')},
+    },
+    esbuild: {
+      logOverride: {'this-is-undefined-in-esm': 'silent'},
     },
   });
 };
